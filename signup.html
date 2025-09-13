@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kolam Lab — Sign up</title>
+
+  <style>
+    :root{
+      --saffron:#f6a11a; --maroon:#7c1d1d; --leaf:#1b7a5a;
+      --bg-light:#fffaf6; --panel-light:#ffffff;
+      --muted-light:#6b7280; --text-light:#0f1724;
+      --bg-dark:#0b1220; --panel-dark:#0f1728;
+      --muted-dark:#9fb0d0; --text-dark:#f6fbff;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+      background:var(--bg-light); color:var(--text-light);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      transition: background-color .28s ease, color .28s ease;
+    }
+
+    .pattern-light{
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23e9e5e0' stroke-width='2' opacity='0.38'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+      background-repeat: repeat; background-size:520px;
+    }
+    .pattern-dark{
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23192a3f' stroke-width='0.8' opacity='0.12'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+      background-repeat: repeat; background-size:520px;
+    }
+
+    .container {
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+    }
+
+    .card {
+      width:100%;
+      max-width:480px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
+      padding:28px;
+      border-radius:14px;
+      box-shadow:0 20px 50px rgba(16,24,40,0.08);
+      transition: background .28s ease, border .28s ease, color .28s ease;
+    }
+
+    /* dark variants */
+    html.dark body { background:var(--bg-dark); color:var(--text-dark); }
+    html.dark .card{
+      background: linear-gradient(180deg, var(--panel-dark), rgba(7,12,20,0.9));
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 18px 50px rgba(2,6,23,0.6);
+      color: var(--text-dark);
+    }
+
+    /* inputs / fields - keep consistent with your existing design */
+    input[type="text"], input[type="email"], input[type="password"], textarea {
+      transition: background .22s ease, color .22s ease, border-color .22s ease, box-shadow .18s ease;
+      outline: none;
+      font-size:14px;
+    }
+    input, textarea {
+      background: #fff;
+      color: var(--text-light);
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 12px;
+      border-radius: 8px;
+    }
+    input:focus, textarea:focus {
+      box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+      border-color: rgba(124,29,29,0.12);
+    }
+    html.dark input, html.dark textarea {
+      background: rgba(255,255,255,0.02);
+      color: var(--text-dark);
+      border-color: rgba(255,255,255,0.06);
+    }
+    html.dark input:focus {
+      box-shadow: 0 6px 24px rgba(2,6,23,0.45);
+      border-color: rgba(255,213,154,0.06);
+    }
+
+    .pw-inline-msg {display:none;margin-bottom:6px;font-weight:700;color:#b91c1c;font-size:13px;}
+    .hidden{display:none;}
+
+    /* ===== Improved CAPTCHA styling (only these rules changed) ===== */
+    /* container for the captcha question */
+    #captchaQuestion {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:140px;
+      padding:12px 18px;
+      border-radius:12px;
+      font-weight:800;
+      letter-spacing:1px;
+      color: #0b1220;
+      background: linear-gradient(180deg,#ffffff,#fbfbfb);
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 8px 22px rgba(16,24,40,0.06), inset 0 -6px 18px rgba(0,0,0,0.03);
+      transition: background .22s ease, color .22s ease, box-shadow .22s ease, transform .12s ease;
+      font-size:15px;
+    }
+
+    /* nicer input for captcha answer */
+    #captchaInput {
+      padding:10px 12px;
+      border-radius:10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      min-width:110px;
+      background: #fff;
+      color: var(--text-light);
+      font-weight:600;
+    }
+    #captchaInput:focus {
+      box-shadow: 0 8px 20px rgba(16,24,40,0.06);
+      border-color: rgba(124,29,29,0.12);
+    }
+
+    /* refresh button style */
+    #captchaRefresh {
+      padding:8px 12px;
+      border-radius:10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: linear-gradient(180deg, #ffffff, #f6f6f6);
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .12s ease, box-shadow .12s ease, background .18s ease;
+    }
+    #captchaRefresh:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,24,40,0.06); }
+
+    /* focus/active visuals */
+    #captchaQuestion:focus, #captchaQuestion:active { transform: translateY(-2px); }
+
+    /* Dark mode tweaks for captcha */
+    html.dark #captchaQuestion {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      color: var(--text-dark);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 32px rgba(2,6,23,0.55), inset 0 -6px 18px rgba(255,255,255,0.01);
+    }
+    html.dark #captchaInput {
+      background: rgba(255,255,255,0.02);
+      color: var(--text-dark);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    html.dark #captchaRefresh {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-dark);
+    }
+
+    /* small responsive */
+    @media (max-width:560px) {
+      .card { padding:20px; }
+      #captchaQuestion { min-width:120px; padding:10px 14px; font-size:14px; }
+      #captchaInput { min-width:90px; }
+    }
+  </style>
+</head>
+<body class="pattern-light">
+
+  <div class="container">
+    <div class="card" role="region" aria-label="Sign up">
+      <div class="mb-4" style="display:flex;align-items:center;gap:12px;">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--saffron),var(--maroon));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800">K</div>
+        <div>
+          <div style="font-weight:800;font-size:18px">Kolam Lab</div>
+          <div style="font-size:12px;color:var(--muted-light)">Design • Analyze • Generate</div>
+        </div>
+      </div>
+
+      <h2 style="font-size:20px;font-weight:800;margin:6px 0 18px 0;">Create your account</h2>
+
+      <form id="signupForm" novalidate>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">First name <span style="color:#ef4444">*</span></label>
+          <input id="firstName" type="text" class="input" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)" />
+          <p id="errFirst" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">Required</p>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Email <span style="color:#ef4444">*</span></label>
+          <input id="signupEmail" type="email" class="input" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)" />
+          <p id="errSignupEmail" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">Invalid email</p>
+        </div>
+
+        <!-- Inline popup above password -->
+        <div id="pwInlineMsg" class="pw-inline-msg" role="alert" aria-live="assertive"></div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Password <span style="color:#ef4444">*</span></label>
+          <input id="signupPwd" type="password" minlength="6" class="input" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)" placeholder="Choose a password (min 6 chars)" />
+          <p id="errSignupPwd" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">Password must be at least 6 characters</p>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Confirm password <span style="color:#ef4444">*</span></label>
+          <input id="confirmPwd" type="password" class="input" style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)" placeholder="Re-enter password" />
+          <p id="errConfirm" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">Passwords do not match</p>
+        </div>
+
+        <!-- Captcha -->
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Verification — prove you're human <span style="color:#ef4444">*</span></label>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="captchaQuestion" tabindex="0" aria-hidden="false">5 + 2 = ?</div>
+            <input id="captchaInput" type="text" placeholder="Answer" />
+            <button id="captchaRefresh" type="button" aria-label="Refresh captcha">↻</button>
+          </div>
+          <p id="errCaptcha" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">Please solve the challenge</p>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <label style="display:inline-flex;align-items:center;gap:8px;">
+            <input id="agree" type="checkbox" />
+            <span style="font-size:13px;color:var(--muted-light)">I agree to the terms and privacy (required)</span>
+          </label>
+          <p id="errAgree" class="hidden" style="color:#ef4444;font-size:13px;margin-top:6px;">You must agree to continue</p>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;">
+          <button id="createAccountBtn" type="submit" style="padding:12px 18px;border-radius:10px;background:linear-gradient(90deg,var(--saffron),var(--leaf));color:white;border:none;font-weight:700;cursor:pointer;">Create account</button>
+          <a href="login.html" style="font-size:13px;color:var(--muted-light);text-decoration:none;">Back to login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastArea" style="position:fixed;right:20px;bottom:20px;z-index:9999;"></div>
+
+  <script>
+    // If user toggles dark mode elsewhere (home/login), the signup page should reflect that.
+    function applyDarkMode(on) {
+      if (on) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.remove('pattern-light');
+        document.body.classList.add('pattern-dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('pattern-dark');
+        document.body.classList.add('pattern-light');
+      }
+    }
+    applyDarkMode(localStorage.getItem('kolam-dark') === '1');
+    window.addEventListener('storage', (ev) => {
+      if (ev.key === 'kolam-dark') applyDarkMode(ev.newValue === '1');
+    });
+
+    // CAPTCHA generator
+    let currentCaptchaAnswer = null;
+    const captchaQuestion = document.getElementById('captchaQuestion');
+    const captchaInput = document.getElementById('captchaInput');
+    const captchaRefresh = document.getElementById('captchaRefresh');
+    function genCaptcha() {
+      const a = Math.floor(Math.random()*9)+1;
+      const b = Math.floor(Math.random()*9)+1;
+      currentCaptchaAnswer = String(a + b);
+      captchaQuestion.textContent = `${a} + ${b} = ?`;
+      captchaInput.value = '';
+      document.getElementById('errCaptcha').classList.add('hidden');
+    }
+    captchaRefresh.addEventListener('click', genCaptcha);
+    genCaptcha();
+
+    // Inline password message element
+    const pwInlineMsg = document.getElementById('pwInlineMsg');
+
+    // Utility tests
+    function hasSpecial(s) {
+      return /[!@#$%^&*(),.?":{}|<>_\-\\\/\[\];'`~+=]/.test(s);
+    }
+    function hasLower(s){ return /[a-z]/.test(s); }
+    function hasUpper(s){ return /[A-Z]/.test(s); }
+    function hasDigit(s){ return /\d/.test(s); }
+
+    // Confirm password inline hide/show
+    const signupPwd = document.getElementById('signupPwd');
+    const confirmPwd = document.getElementById('confirmPwd');
+    confirmPwd.addEventListener('input', ()=> {
+      document.getElementById('errConfirm').classList.toggle('hidden', confirmPwd.value === signupPwd.value);
+    });
+
+    // Toast helper
+    function showToast(msg, timeout = 2600) {
+      const area = document.getElementById('toastArea');
+      const el = document.createElement('div');
+      el.style.background = '#ffffff';
+      el.style.padding = '10px 14px';
+      el.style.borderRadius = '10px';
+      el.style.boxShadow = '0 8px 22px rgba(2,6,23,0.08)';
+      el.style.marginTop = '8px';
+      el.innerText = msg;
+      area.appendChild(el);
+      setTimeout(()=> { el.style.transition = 'opacity .28s'; el.style.opacity = '0'; setTimeout(()=> el.remove(),300); }, timeout);
+    }
+
+    // When user edits password, hide the inline popup if they add a special char
+    const pwdEl = document.getElementById('signupPwd');
+    pwdEl.addEventListener('input', () => {
+      if (hasSpecial(pwdEl.value)) {
+        pwInlineMsg.style.display = 'none';
+        pwInlineMsg.textContent = '';
+      }
+      document.getElementById('errSignupPwd').classList.toggle('hidden', pwdEl.value.length >= 6);
+    });
+
+    // Form submit handler: validate, save user, then redirect to home.html ON SUCCESS
+    document.getElementById('signupForm').addEventListener('submit', function(e){
+      e.preventDefault();
+
+      // Clear previous inline message and errors
+      pwInlineMsg.style.display = 'none';
+      pwInlineMsg.textContent = '';
+      ['errFirst','errSignupEmail','errSignupPwd','errConfirm','errCaptcha','errAgree'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      // Read values
+      const first = document.getElementById('firstName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const pwd = document.getElementById('signupPwd').value;
+      const confirm = document.getElementById('confirmPwd').value;
+      const agree = document.getElementById('agree').checked;
+      const captchaVal = document.getElementById('captchaInput').value.trim();
+
+      // Basic validations
+      let ok = true;
+      if (!first) { document.getElementById('errFirst').classList.remove('hidden'); ok = false; }
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) { document.getElementById('errSignupEmail').classList.remove('hidden'); ok = false; }
+      if (!pwd || pwd.length < 6) { document.getElementById('errSignupPwd').classList.remove('hidden'); ok = false; }
+      if (confirm !== pwd) { document.getElementById('errConfirm').classList.remove('hidden'); ok = false; }
+      if (!agree) { document.getElementById('errAgree').classList.remove('hidden'); ok = false; }
+      if (!captchaVal || captchaVal !== currentCaptchaAnswer) { document.getElementById('errCaptcha').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        showToast('Please fix the errors highlighted on the form');
+        return;
+      }
+
+      // Specific special character inline behavior (only show inline message if missing)
+      if (!hasSpecial(pwd)) {
+        pwInlineMsg.textContent = 'Password must include at least one special character (e.g. !@#$%^&*).';
+        pwInlineMsg.style.display = 'block';
+        document.getElementById('signupPwd').focus();
+        return;
+      }
+
+      // Also warn via toast if missing lower/upper/digit (you asked special char inline; others as toast)
+      const missing = [];
+      if (!hasLower(pwd)) missing.push('a lowercase letter');
+      if (!hasUpper(pwd)) missing.push('an uppercase letter');
+      if (!hasDigit(pwd)) missing.push('a number');
+      if (missing.length) {
+        showToast('Password should also include ' + missing.join(', ') + '.');
+        return;
+      }
+
+      // Save user (demo: localStorage) - no design change
+      const users = JSON.parse(localStorage.getItem('kolam_users') || '[]');
+      if (users.find(u=>u.email === email)) {
+        showToast('Account already exists with this email', 3000);
+        return;
+      }
+      users.push({first, last: document.getElementById('lastName') ? document.getElementById('lastName').value.trim() : '', email, password: pwd});
+      localStorage.setItem('kolam_users', JSON.stringify(users));
+
+      // SUCCESS — redirect to home.html (only change requested)
+      showToast('Account created — redirecting to home...', 1400);
+      setTimeout(()=> { window.location.href = 'home.html'; }, 900);
+    });
+  </script>
+</body>
+</html>

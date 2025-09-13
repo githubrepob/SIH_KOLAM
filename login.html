@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kolam Lab — Login</title>
+
+  <!-- Tailwind CDN (kept from previous versions) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root{
+      --saffron:#f6a11a;
+      --maroon:#7c1d1d;
+      --leaf:#1b7a5a;
+      --bg-light:#fffaf6;
+      --panel-light:#ffffff;
+      --muted-light:#6b7280;
+      --text-light:#0f1724;
+      --bg-dark:#0b1220;
+      --panel-dark:#0f1728;
+      --muted-dark:#9fb0d0;
+      --text-dark:#f6fbff;
+    }
+
+    html,body{height:100%}
+    body{
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      margin:0;
+      background: var(--bg-light);
+      color: var(--text-light);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    .pattern-light{
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23e9e5e0' stroke-width='2' opacity='0.38'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+      background-repeat: repeat; background-size:520px;
+    }
+    .pattern-dark{
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23192a3f' stroke-width='2' opacity='0.16'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+      background-repeat: repeat; background-size:520px;
+    }
+
+    .fullscreen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px; }
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.9));
+      border-radius:14px;
+      box-shadow:0 20px 50px rgba(16,24,40,0.08);
+      padding:28px;
+      width:100%;
+      max-width:480px; /* reduced since no image */
+      display:block;
+    }
+
+    /* Inline form alert (appears above the form fields) */
+    .form-alert {
+      display:none;
+      margin-bottom:12px;
+      padding:10px 12px;
+      border-radius:10px;
+      font-weight:600;
+      color: #7f1d1d; /* text red */
+      background: #fff1f2; /* light red background */
+      border: 1px solid rgba(127,29,29,0.08);
+      box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+    }
+    .form-alert.show { display:block; animation: pop .22s ease; }
+    @keyframes pop { from { transform: translateY(-6px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+    html.dark .form-alert {
+      color: #ffd7d9;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    html.dark body { background: var(--bg-dark); color: var(--text-dark); }
+    html.dark .glass { background: linear-gradient(180deg, var(--panel-dark), rgba(12,18,26,0.9)); border: 1px solid rgba(255,255,255,0.04); color:var(--text-dark); }
+    html.dark input { color:var(--text-dark); background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.06) }
+    html.dark .muted { color: var(--muted-dark); }
+
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 9999; min-width: 220px; }
+  </style>
+</head>
+<body class="pattern-light">
+
+  <div class="fullscreen">
+    <div class="glass" role="region" aria-label="Login panel">
+
+      <!-- LEFT: Login form -->
+      <div>
+        <div class="mb-3">
+          <div class="flex items-center gap-3">
+            <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--saffron),var(--maroon));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800">K</div>
+            <div>
+              <div style="font-weight:800;font-size:18px">Kolam Lab</div>
+              <div class="muted" style="font-size:12px">Design • Analyze • Generate</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-extrabold mb-2">Welcome back</h2>
+        <p class="muted mb-6">Sign in to access the Analyzer, Studio and Generator.</p>
+
+        <!-- Inline form alert: will show invalid credentials / mismatched messages here -->
+        <div id="formAlert" class="form-alert" role="alert" aria-live="assertive"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Email <span class="text-red-500">*</span></label>
+            <input id="loginEmail" name="email" type="email" required
+                   class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                   placeholder="you@example.com" />
+            <p id="errEmail" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email.</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-sm font-medium mb-1">Password <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <input id="loginPassword" name="password" type="password" required
+                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-300 pr-12"
+                     placeholder="Enter your password" />
+              <button type="button" id="togglePwd" aria-label="Show password"
+                      class="absolute right-2 top-2.5 text-sm px-2 py-1 rounded-md bg-white/60 dark:bg-white/10">Show</button>
+            </div>
+            <p id="errPassword" class="text-red-500 text-sm mt-1 hidden">Password is required.</p>
+          </div>
+
+          <div class="flex items-center justify-between mb-6">
+            <label class="inline-flex items-center gap-2">
+              <input id="rememberMe" type="checkbox" class="h-4 w-4"/>
+              <span class="text-sm muted">Remember me</span>
+            </label>
+            <a href="#" id="forgotLink" class="text-sm text-slate-600 hover:underline muted">Forgot password?</a>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button id="submitLogin" type="submit"
+                    class="px-5 py-3 rounded-lg bg-gradient-to-r from-yellow-500 to-green-600 text-white font-semibold shadow">
+              Sign in
+            </button>
+            <button id="demoLogin" type="button"
+                    class="px-4 py-3 rounded-lg border border-gray-200 text-sm muted">
+              Demo login
+            </button>
+          </div>
+
+          <p class="mt-4 text-sm muted">New user? <a id="goSignup" href="signup.html" class="text-maroon hover:underline" >Create an account</a></p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast area -->
+  <div id="toastArea" class="toast"></div>
+
+  <script>
+    if (localStorage.getItem('kolam-dark') === '1') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.remove('pattern-light');
+      document.body.classList.add('pattern-dark');
+    }
+
+    // references
+    const formAlert = document.getElementById('formAlert');
+    const loginForm = document.getElementById('loginForm');
+    const emailEl = document.getElementById('loginEmail');
+    const pwdEl = document.getElementById('loginPassword');
+    const errEmail = document.getElementById('errEmail');
+    const errPwd = document.getElementById('errPassword');
+
+    // tracks the last failed attempt's snapshot "email|password"
+    let lastFailedSnapshot = null;
+
+    function showFormAlert(message) {
+      formAlert.textContent = message;
+      formAlert.classList.add('show');
+    }
+    function hideFormAlert() {
+      formAlert.classList.remove('show');
+      setTimeout(()=> { formAlert.textContent = ''; }, 220);
+    }
+
+    function showToast(message, timeout = 2800) {
+      const area = document.getElementById('toastArea');
+      const el = document.createElement('div');
+      el.className = 'rounded-lg px-4 py-3 shadow-lg mb-3 bg-white';
+      if (document.documentElement.classList.contains('dark')) {
+        el.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))';
+        el.style.color = 'var(--text-dark)';
+      }
+      el.innerText = message;
+      area.appendChild(el);
+      setTimeout(()=> { el.style.transition = 'opacity .28s'; el.style.opacity = '0'; setTimeout(()=> el.remove(),300); }, timeout);
+    }
+
+    // password toggle
+    document.getElementById('togglePwd').addEventListener('click', function (ev) {
+      if (pwdEl.type === 'password') { pwdEl.type = 'text'; ev.target.innerText = 'Hide'; }
+      else { pwdEl.type = 'password'; ev.target.innerText = 'Show'; }
+      pwdEl.focus();
+    });
+
+    // demo login
+    document.getElementById('demoLogin').addEventListener('click', ()=> {
+      const demoUser = {email:'demo@kolam.test', password:'demo1234'};
+      localStorage.setItem('kolam_users_demo', JSON.stringify([demoUser]));
+      emailEl.value = demoUser.email;
+      pwdEl.value = demoUser.password;
+      // programmatically submit (will follow same submit logic)
+      loginForm.dispatchEvent(new Event('submit', {cancelable:true}));
+    });
+
+    // SUBMIT logic:
+    // - Do NOT hide existing alert blindly.
+    // - If current inputs differ from lastFailedSnapshot, clear the old alert before validating (this means user re-entered details).
+    // - If current inputs equal lastFailedSnapshot, keep the old alert visible until we decide result of this submission.
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const currentSnapshot = (emailEl.value||'') + '|' + (pwdEl.value||'');
+
+      // If user has changed inputs since last failure, remove previous alert now.
+      if (lastFailedSnapshot && currentSnapshot !== lastFailedSnapshot) {
+        hideFormAlert();
+        lastFailedSnapshot = null; // reset; we'll set if this attempt fails
+      }
+
+      // clear field-level errors
+      errEmail.classList.add('hidden');
+      errPwd.classList.add('hidden');
+
+      let ok = true;
+      if (!emailEl.value || !/^\S+@\S+\.\S+$/.test(emailEl.value)) {
+        errEmail.classList.remove('hidden'); ok = false;
+      }
+      if (!pwdEl.value) {
+        errPwd.classList.remove('hidden'); ok = false;
+      }
+      if (!ok) return;
+
+      const stored = JSON.parse(localStorage.getItem('kolam_users') || '[]');
+      const demo = JSON.parse(localStorage.getItem('kolam_users_demo') || '[]');
+      const all = stored.concat(demo);
+      const user = all.find(u => u.email === emailEl.value && u.password === pwdEl.value);
+
+      if (user) {
+        // success: clear any previous failed snapshot & alert, then go to home.html
+        lastFailedSnapshot = null;
+        hideFormAlert();
+        showToast('Signed in successfully ✅');
+        if (document.getElementById('rememberMe').checked) {
+          localStorage.setItem('kolam_current', JSON.stringify({email:user.email}));
+        } else {
+          localStorage.removeItem('kolam_current');
+        }
+        setTimeout(()=> { window.location.href = 'home.html'; }, 900);
+      } else {
+        // failed: show the inline suggestion and record snapshot so we know user must change inputs to clear it
+        showFormAlert('Invalid credentials — please check email and password and try again.');
+        lastFailedSnapshot = currentSnapshot;
+        emailEl.focus();
+      }
+    });
+
+    // Note: we intentionally do NOT hide the alert on input events here.
+    // The alert will remain visible until the user changes inputs AND submits (handled above).
+  </script>
+</body>
+</html>
+
+
+

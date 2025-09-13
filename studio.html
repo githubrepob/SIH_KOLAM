@@ -1,0 +1,327 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kolam Lab — Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --saffron: #f6a11a;
+      --maroon: #7c1d1d;
+      --leaf: #1b7a5a;
+      --panel-light: #ffffff;
+      --panel-dark: #0f1728;
+      --muted-light: #6b7280;
+      --muted-dark: #9fb0d0;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: linear-gradient(180deg, #fffaf6, #fff6ef);
+      color: #0f1724;
+      overflow-x: hidden;
+    }
+    .site-nav { position: fixed; top: 0; left: 0; right: 0; height: 100px; z-index: 70;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,250,245,0.72));
+      border-bottom: 1px solid rgba(16,24,40,0.04);
+      backdrop-filter: blur(8px) saturate(120%);
+      padding: 0 20px; box-sizing: border-box;
+      box-shadow: 0 6px 20px rgba(16,24,40,0.04);
+    }
+    .nav-container { width: 100%; max-width: 1200px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo-mark { width: 56px; height: 56px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-weight: 800; background: linear-gradient(135deg, var(--saffron), var(--maroon));
+      box-shadow: 0 8px 20px rgba(124,29,29,0.12); font-size: 24px;
+    }
+    .brand .title { font-weight: 800; color: #0f1724; }
+    .brand .tag { font-size: 12px; color: var(--muted-light); margin-top:2px; }
+    .nav-links { display:flex; gap:28px; align-items:center; }
+    .nav-link { font-weight:700; color: rgba(15,23,36,0.9); text-decoration:none; padding:8px 10px; border-radius:8px; }
+    .nav-link.active { color:var(--maroon); background: linear-gradient(90deg, rgba(124,29,29,0.06), rgba(246,161,26,0.03)); }
+
+    html.dark body { background: linear-gradient(180deg,#06111a,#071224); color: #f6fbff; }
+    html.dark .site-nav { background: linear-gradient(180deg, rgba(7,12,20,0.92), rgba(6,10,18,0.92)); border-bottom:1px solid rgba(255,255,255,0.04); }
+
+    main { padding-top: 120px; max-width: 1200px; margin: 0 auto; padding-left:20px; padding-right:20px; }
+    .studio-grid { display: grid; grid-template-columns: 1fr; gap:20px; align-items:start; }
+    @media (min-width: 1100px) { .studio-grid { grid-template-columns: 280px 1fr 280px; } }
+
+    .panel { background: var(--panel-light); border-radius:14px; padding:16px; box-shadow:0 14px 40px rgba(16,24,40,0.06); }
+    html.dark .panel { background: linear-gradient(180deg,var(--panel-dark),rgba(7,12,20,0.9)); border:1px solid rgba(255,255,255,0.04); color:var(--muted-dark); }
+
+    #canvas-container { position: relative; width: 100%; padding-bottom: 66.6667%; border-radius:12px; overflow:hidden; border:1px solid rgba(0,0,0,0.06); background:#fff; }
+    html.dark #canvas-container { background:#071224; border-color: rgba(255,255,255,0.04); }
+
+    #gridCanvas, #kolamCanvas { position:absolute; top:0; left:0; width:100%; height:100%; display:block; border-radius:12px; }
+    #gridCanvas { z-index:1; pointer-events:none; }
+    #kolamCanvas { z-index:2; cursor:crosshair; background:transparent; touch-action:none; }
+
+    .maroon-btn { background: linear-gradient(90deg,var(--maroon),#a91919); color:#fff; }
+    .saffron-btn { background: linear-gradient(90deg,var(--saffron),#ffd27f); color:#071224; }
+    button[disabled] { opacity:0.5; cursor:not-allowed; }
+
+    /* === Guide Button === */
+    #guide-btn {
+      position: fixed; bottom: 20px; right: 20px; z-index: 80;
+      background: linear-gradient(135deg,var(--saffron),var(--maroon));
+      color: white; border-radius: 50%; width: 60px; height: 60px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+      cursor: pointer; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transition: transform 0.3s ease;
+    }
+    #guide-btn:hover { transform: scale(1.1); }
+
+    /* === Guide Panel === */
+    #guide-panel {
+      position: fixed; bottom: 90px; right: 20px; width: 320px; max-height: 400px;
+      background: var(--panel-light); border-radius: 12px; padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      transform: scale(0); transform-origin: bottom right; transition: transform 0.4s ease;
+      z-index: 80; overflow-y: auto;
+    }
+    #guide-panel.open { transform: scale(1); }
+    html.dark #guide-panel { background: var(--panel-dark); color: var(--muted-dark); }
+  </style>
+</head>
+<body>
+  <header class="site-nav">
+    <div class="nav-container">
+      <div class="flex items-center gap-4">
+        <div class="logo-mark">K</div>
+        <div class="brand">
+          <div class="title">Kolam Lab</div>
+          <div class="tag">Design • Analyze • Generate</div>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="home.html">Home</a>
+        <a class="nav-link active" href="studio.html">Studio</a>
+        <a class="nav-link" href="analyzer.html">Analyzer</a>
+        <a class="nav-link" href="generator.html">Generator</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="studio-grid">
+      <!-- LEFT PANEL -->
+      <aside class="panel">
+        <h3 class="text-lg font-bold mb-3">Tools</h3>
+        <div class="space-y-2">
+          <button id="tool-freehand" class="w-full tool-btn px-3 py-2 rounded bg-slate-100 text-sm font-semibold active">✏ Freehand</button>
+          <button id="tool-line" class="w-full tool-btn px-3 py-2 rounded bg-slate-100 text-sm font-semibold">📏 Line</button>
+          <button id="tool-circle" class="w-full tool-btn px-3 py-2 rounded bg-slate-100 text-sm font-semibold">⭕ Circle</button>
+        </div>
+        <hr class="my-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Brush Size: <span id="size-display">3</span>px</label>
+          <input id="brush-size" type="range" min="1" max="50" value="3" class="w-full mb-3"/>
+          <label class="block text-sm font-semibold mb-1">Brush Color</label>
+          <input id="brush-color" type="color" value="#000000" class="w-full h-10 p-0"/>
+        </div>
+        <hr class="my-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Grid Size</label>
+          <input id="grid-size" type="number" min="2" max="40" value="5" class="w-full mb-2 rounded px-2 py-1 text-black"/>
+          <div class="flex gap-2">
+            <button id="drawGridBtn" class="flex-1 saffron-btn py-2 rounded font-semibold">Draw Grid</button>
+            <button id="toggleGridBtn" class="flex-1 bg-amber-100 text-amber-900 py-2 rounded font-semibold border border-amber-200">Show/Hide</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER PANEL -->
+      <section class="panel">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-bold">Dot Grid Studio</h3>
+          <div class="flex gap-2">
+            <button id="undoBtn" class="px-3 py-2 rounded bg-white border" disabled>↩ Undo</button>
+            <button id="redoBtn" class="px-3 py-2 rounded bg-white border" disabled>↪ Redo</button>
+            <button id="clearBtnCenter" class="px-3 py-2 rounded maroon-btn">Clear</button>
+          </div>
+        </div>
+        <div id="canvas-container">
+          <canvas id="gridCanvas"></canvas>
+          <canvas id="kolamCanvas"></canvas>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL -->
+      <aside class="panel">
+        <h3 class="text-lg font-bold mb-3">Actions</h3>
+        <div class="space-y-3">
+          <button id="exportSvgBtn" class="w-full px-3 py-2 rounded bg-amber-50 border border-amber-200 text-amber-900 font-semibold">📄 Export</button>
+          <button id="downloadJsonBtn" class="w-full px-3 py-2 rounded bg-amber-100 text-amber-900 font-semibold">💾 Save to Art Gallery</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="text-center py-6 mt-10">© <span id="yr"></span> Kolam Lab</footer>
+
+  <!-- GUIDE BUTTON -->
+  <div id="guide-btn">📖</div>
+  <div id="guide-panel">
+    <h3 class="font-bold text-lg mb-2">Kolam Guide</h3>
+    <ol class="list-decimal pl-4 space-y-1 text-sm">
+      <li>Start with drawing a grid of dots.</li>
+      <li>Connect the dots using curves or lines.</li>
+      <li>Form symmetric patterns around the center.</li>
+      <li>Repeat the design for a complete Kolam.</li>
+    </ol>
+    <textarea id="guide-feedback" placeholder="Add your own step or feedback..." class="w-full mt-3 p-2 rounded border text-sm text-black"></textarea>
+    <button id="submit-feedback" class="mt-2 w-full saffron-btn py-2 rounded font-semibold">Submit Feedback</button>
+  </div>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+
+    const guideBtn = document.getElementById("guide-btn");
+    const guidePanel = document.getElementById("guide-panel");
+    guideBtn.onclick = () => guidePanel.classList.toggle("open");
+
+    document.getElementById("submit-feedback").onclick = () => {
+      const val = document.getElementById("guide-feedback").value.trim();
+      if(val){ alert("Feedback submitted: "+val); document.getElementById("guide-feedback").value=""; }
+      else alert("Please enter some feedback.");
+    };
+
+    // === Canvas Logic ===
+    const container = document.getElementById('canvas-container');
+    const gridCanvas = document.getElementById('gridCanvas');
+    const gridCtx = gridCanvas.getContext('2d');
+    const kolamCanvas = document.getElementById('kolamCanvas');
+    const ctx = kolamCanvas.getContext('2d');
+
+    const brushSizeInput = document.getElementById('brush-size');
+    const brushColorInput = document.getElementById('brush-color');
+    const sizeDisplay = document.getElementById('size-display');
+    const gridSizeInput = document.getElementById('grid-size');
+
+    let tool='freehand', drawing=false, lastPos=null;
+    let history=[], redoStack=[], gridVisible=true;
+    const gridState = {size:5, dots:[]};
+    const DOT_RADIUS = 4;
+
+    function setActiveToolBtn(id){
+      document.querySelectorAll('.tool-btn').forEach(el=>el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+    document.getElementById('tool-freehand').onclick=()=>{tool='freehand';setActiveToolBtn('tool-freehand');};
+    document.getElementById('tool-line').onclick=()=>{tool='line';setActiveToolBtn('tool-line');};
+    document.getElementById('tool-circle').onclick=()=>{tool='circle';setActiveToolBtn('tool-circle');};
+
+    brushSizeInput.oninput=e=>{ctx.lineWidth=+e.target.value;sizeDisplay.textContent=e.target.value;};
+    brushColorInput.oninput=e=>{ctx.strokeStyle=e.target.value;};
+    ctx.lineWidth=+brushSizeInput.value; ctx.strokeStyle=brushColorInput.value;
+
+    function resizeCanvases(){
+      const rect=container.getBoundingClientRect();
+      const w=rect.width, h=rect.height;
+      const ratio = window.devicePixelRatio || 1;
+      gridCanvas.width = kolamCanvas.width = Math.floor(w*ratio);
+      gridCanvas.height = kolamCanvas.height = Math.floor(h*ratio);
+      gridCanvas.style.width = kolamCanvas.style.width = w+'px';
+      gridCanvas.style.height = kolamCanvas.style.height = h+'px';
+      gridCtx.setTransform(ratio,0,0,ratio,0,0);
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      buildGridState(gridState.size);
+      renderGrid();
+      renderFromHistory();
+    }
+    window.onresize = resizeCanvases;
+
+    function buildGridState(size){
+      gridState.size=Math.max(2,Math.min(40,size));
+      gridState.dots=[];
+      const w=parseFloat(gridCanvas.style.width), h=parseFloat(gridCanvas.style.height);
+      const spacingX=w/(gridState.size+1), spacingY=h/(gridState.size+1);
+      for(let i=1;i<=gridState.size;i++){for(let j=1;j<=gridState.size;j++){
+        gridState.dots.push({x:Math.round(i*spacingX),y:Math.round(j*spacingY)});
+      }}
+    }
+    function renderGrid(){
+      const w=gridCanvas.width/(window.devicePixelRatio||1), h=gridCanvas.height/(window.devicePixelRatio||1);
+      gridCtx.clearRect(0,0,w,h); if(!gridVisible) return;
+      const baseDot = document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.72)';
+      gridState.dots.forEach(d=>{gridCtx.beginPath();gridCtx.arc(d.x,d.y,DOT_RADIUS,0,Math.PI*2);gridCtx.fillStyle=baseDot;gridCtx.fill();});
+    }
+
+    function getLocalCoords(e){const r=kolamCanvas.getBoundingClientRect();return {x:e.clientX-r.left, y:e.clientY-r.top};}
+    function saveState(){history.push(kolamCanvas.toDataURL()); redoStack=[]; if(history.length>100) history.shift(); updateUndoRedo();}
+    function renderFromHistory(){ctx.clearRect(0,0,kolamCanvas.width,kolamCanvas.height); if(history.length===0) return; let img=new Image(); img.onload=()=>ctx.drawImage(img,0,0,kolamCanvas.width/(window.devicePixelRatio||1),kolamCanvas.height/(window.devicePixelRatio||1)); img.src=history[history.length-1];}
+    function undo(){if(history.length>1){redoStack.push(history.pop());renderFromHistory();} else {history=[];redoStack=[]; ctx.clearRect(0,0,kolamCanvas.width,kolamCanvas.height);} updateUndoRedo();}
+    function redo(){if(redoStack.length>0){history.push(redoStack.pop());renderFromHistory();} updateUndoRedo();}
+    function updateUndoRedo(){document.getElementById('undoBtn').disabled = history.length<=1; document.getElementById('redoBtn').disabled = redoStack.length===0;}
+
+    kolamCanvas.onpointerdown = e=>{
+      if(e.button!==0) return;
+      kolamCanvas.setPointerCapture(e.pointerId);
+      lastPos = getLocalCoords(e); drawing=true;
+      if(tool==='freehand'){ctx.beginPath();ctx.moveTo(lastPos.x,lastPos.y);}
+      else kolamCanvas.dataset.tempStart=JSON.stringify(lastPos);
+    };
+    kolamCanvas.onpointermove = e=>{
+      if(!drawing) return;
+      const loc=getLocalCoords(e);
+      ctx.lineWidth=+brushSizeInput.value; ctx.strokeStyle=brushColorInput.value;
+      if(tool==='freehand'){ctx.lineTo(loc.x,loc.y); ctx.stroke();}
+      else if(kolamCanvas.dataset.tempStart){
+        renderFromHistory();
+        const start=JSON.parse(kolamCanvas.dataset.tempStart);
+        if(tool==='line'){ctx.beginPath();ctx.moveTo(start.x,start.y);ctx.lineTo(loc.x,loc.y);ctx.stroke();}
+        else if(tool==='circle'){const dx=loc.x-start.x, dy=loc.y-start.y, r=Math.sqrt(dx*dx+dy*dy); ctx.beginPath(); ctx.arc(start.x,start.y,r,0,Math.PI*2); ctx.stroke();}
+      }
+    };
+    kolamCanvas.onpointerup = e=>{
+      if(!drawing) return;
+      drawing=false;
+      if(tool==='freehand'){ctx.closePath(); saveState();}
+      else if(kolamCanvas.dataset.tempStart){
+        const start = JSON.parse(kolamCanvas.dataset.tempStart);
+        const end = getLocalCoords(e);
+        if(tool==='line'){ctx.beginPath(); ctx.moveTo(start.x,start.y); ctx.lineTo(end.x,end.y); ctx.stroke();}
+        else if(tool==='circle'){const dx=end.x-start.x, dy=end.y-start.y, r=Math.sqrt(dx*dx+dy*dy); ctx.beginPath(); ctx.arc(start.x,start.y,r,0,Math.PI*2); ctx.stroke();}
+        saveState();
+        delete kolamCanvas.dataset.tempStart;
+      }
+      updateUndoRedo();
+    };
+
+    document.getElementById('drawGridBtn').onclick=()=>{buildGridState(+gridSizeInput.value);renderGrid();};
+    document.getElementById('toggleGridBtn').onclick=()=>{gridVisible=!gridVisible; renderGrid();};
+    document.getElementById('clearBtnCenter').onclick=()=>{ctx.clearRect(0,0,kolamCanvas.width,kolamCanvas.height);history=[];redoStack=[]; saveState(); renderGrid(); updateUndoRedo();};
+    document.getElementById('undoBtn').onclick=undo;
+    document.getElementById('redoBtn').onclick=redo;
+
+    // Export
+    document.getElementById('exportSvgBtn').onclick=()=>{
+      const format = prompt("Choose format: svg, png, jpg, jpeg, pdf");
+      if(!format) return;
+      const fmt=format.toLowerCase();
+      if(fmt==='svg'){
+        const dataUrl = kolamCanvas.toDataURL("image/png");
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${kolamCanvas.width}" height="${kolamCanvas.height}"><image href="${dataUrl}" width="100%" height="100%"/></svg>`;
+        const blob=new Blob([svg],{type:"image/svg+xml"}); triggerDownload(blob,"kolam.svg");
+      } else if(['png','jpg','jpeg'].includes(fmt)){
+        const mime=(fmt==='png')?'image/png':'image/jpeg';
+        kolamCanvas.toBlob(blob=>triggerDownload(blob,`kolam.${fmt}`),mime);
+      } else if(fmt==='pdf'){
+        const imgData = kolamCanvas.toDataURL("image/png");
+        const pdfWindow = window.open("");
+        pdfWindow.document.write(`<iframe width='100%' height='100%' src='data:application/pdf;base64,${btoa(imgData)}'></iframe>`);
+      } else alert("Unsupported format!");
+    };
+    function triggerDownload(blob, filename){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); URL.revokeObjectURL(a.href);}
+    document.getElementById('downloadJsonBtn').onclick=()=>alert('Save to Art Gallery not implemented.');
+
+    // Init
+    function initialSetup(){resizeCanvases(); buildGridState(+gridSizeInput.value); renderGrid(); history.push(kolamCanvas.toDataURL()); updateUndoRedo();}
+    initialSetup();
+  </script>
+</body>
+</html>

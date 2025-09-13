@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kolam Lab — Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --saffron: #f6a11a;
+      --maroon: #7c1d1d;
+      --panel-light: #ffffff;
+      --panel-dark: #0f1728;
+      --muted-light: #6b7280;
+      --muted-dark: #9fb0d0;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: linear-gradient(180deg, #fffaf6, #fff6ef);
+      color: #0f1724;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .site-nav { position: fixed; top: 0; left: 0; right: 0; height: 100px; z-index: 70;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,250,245,0.72));
+      border-bottom: 1px solid rgba(16,24,40,0.04);
+      backdrop-filter: blur(8px) saturate(120%);
+      padding: 0 20px; box-sizing: border-box;
+      box-shadow: 0 6px 20px rgba(16,24,40,0.04);
+    }
+    .nav-container { width: 100%; max-width: 1200px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .logo-mark { width: 56px; height: 56px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-weight: 800; background: linear-gradient(135deg, var(--saffron), var(--maroon));
+      box-shadow: 0 8px 20px rgba(124,29,29,0.12); font-size: 24px;
+    }
+    .brand .title { font-weight: 800; color: #0f1724; }
+    .brand .tag { font-size: 12px; color: var(--muted-light); margin-top:2px; }
+    .nav-links { display:flex; gap:28px; align-items:center; }
+    .nav-link { font-weight:700; color: rgba(15,23,36,0.9); text-decoration:none; padding:8px 10px; border-radius:8px; }
+    .nav-link.active { color:var(--maroon); background: linear-gradient(90deg, rgba(124,29,29,0.06), rgba(246,161,26,0.03)); }
+
+    html.dark body { background: linear-gradient(180deg,#06111a,#071224); color: #f6fbff; }
+    html.dark .site-nav { background: linear-gradient(180deg, rgba(7,12,20,0.92), rgba(6,10,18,0.92)); border-bottom:1px solid rgba(255,255,255,0.04); }
+
+    main { padding-top: 120px; max-width: 800px; margin: 0 auto; padding-left:20px; padding-right:20px; }
+    .panel { background: var(--panel-light); border-radius:14px; padding:16px; box-shadow:0 14px 40px rgba(16,24,40,0.06); }
+    html.dark .panel { background: linear-gradient(180deg,var(--panel-dark),rgba(7,12,20,0.9)); border:1px solid rgba(255,255,255,0.04); color:var(--muted-dark); }
+
+    .drag-area {
+      border: 2px dashed #ccc;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.3s;
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .drag-area.dragover {
+      border-color: var(--maroon);
+      color: var(--maroon);
+    }
+
+    #previewImg, #regeneratedImg { max-width: 100%; max-height: 400px; margin-top: 10px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+
+    .saffron-btn { background: linear-gradient(90deg,var(--saffron),#ffd27f); color:#071224; }
+    .maroon-btn { background: linear-gradient(90deg,var(--maroon),#a91919); color:#fff; }
+  </style>
+</head>
+<body>
+  <header class="site-nav">
+    <div class="nav-container">
+      <div class="flex items-center gap-4">
+        <div class="logo-mark">K</div>
+        <div class="brand">
+          <div class="title">Kolam Lab</div>
+          <div class="tag">Design • Analyze • Generate</div>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="home.html">Home</a>
+        <a class="nav-link" href="studio.html">Studio</a>
+        <a class="nav-link active" href="generator.html">Generator</a>
+        <a class="nav-link" href="analyzer.html">Analyzer</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel relative z-10">
+      <h3 class="text-lg font-bold mb-3">Image Generator</h3>
+
+      <!-- Drag & Drop Area -->
+      <div id="dragArea" class="drag-area">
+        Drag & drop an image here or click to select
+      </div>
+      <input type="file" id="imageUpload" accept="image/*" style="display:none">
+
+      <div class="flex gap-3 mb-3">
+        <div class="flex-1">
+          <button id="previewBtn" class="w-full saffron-btn py-2 rounded font-semibold">Preview</button>
+          <img id="previewImg" src="" alt="Preview will appear here">
+        </div>
+        <div class="flex-1">
+          <button id="regenerateBtn" class="w-full maroon-btn py-2 rounded font-semibold">Re-generate</button>
+          <img id="regeneratedImg" src="" alt="Regenerated image will appear here">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center py-6 mt-10 relative z-10">© <span id="yr"></span> Kolam Lab</footer>
+
+  <!-- Symmetrical dynamic background -->
+  <canvas id="bgCanvas" class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+
+    // Background symmetry animation
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    function resizeBg() {
+      bgCanvas.width = window.innerWidth;
+      bgCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeBg);
+    resizeBg();
+
+    const shapes = [];
+    for(let i=0;i<30;i++){
+      shapes.push({
+        x: Math.random()*window.innerWidth,
+        y: Math.random()*window.innerHeight,
+        size: 50+Math.random()*100,
+        angle: Math.random()*Math.PI*2,
+        speed: 0.002 + Math.random()*0.003,
+        color: `rgba(${200+Math.floor(Math.random()*55)},${100+Math.floor(Math.random()*100)},${150+Math.floor(Math.random()*100)},0.08)`
+      });
+    }
+
+    function drawBg(){
+      bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+      shapes.forEach(s=>{
+        s.angle+=s.speed;
+        bgCtx.save();
+        bgCtx.translate(s.x,s.y);
+        bgCtx.rotate(Math.sin(s.angle)*Math.PI/4);
+        bgCtx.beginPath();
+        for(let i=0;i<6;i++){
+          let a = (Math.PI*2/6)*i;
+          let x = Math.cos(a)*s.size;
+          let y = Math.sin(a)*s.size;
+          bgCtx.lineTo(x,y);
+        }
+        bgCtx.closePath();
+        bgCtx.fillStyle = s.color;
+        bgCtx.fill();
+        bgCtx.restore();
+      });
+      requestAnimationFrame(drawBg);
+    }
+    drawBg();
+
+    // Drag & Drop functionality
+    const dragArea = document.getElementById('dragArea');
+    const imageUpload = document.getElementById('imageUpload');
+    const previewBtn = document.getElementById('previewBtn');
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    const previewImg = document.getElementById('previewImg');
+    const regeneratedImg = document.getElementById('regeneratedImg');
+    let uploadedImage = null;
+
+    dragArea.addEventListener('click', ()=> imageUpload.click());
+
+    dragArea.addEventListener('dragover', e=>{
+      e.preventDefault();
+      dragArea.classList.add('dragover');
+    });
+    dragArea.addEventListener('dragleave', e=>{
+      dragArea.classList.remove('dragover');
+    });
+    dragArea.addEventListener('drop', e=>{
+      e.preventDefault();
+      dragArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      handleFile(file);
+    });
+
+    imageUpload.addEventListener('change', e=>{
+      const file = e.target.files[0];
+      handleFile(file);
+    });
+
+    function handleFile(file){
+      if(file && file.type.startsWith('image/')){
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          uploadedImage = ev.target.result;
+          previewImg.src = ''; // clear preview until preview button clicked
+          regeneratedImg.src = ''; // clear regenerated image
+        }
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please upload a valid image.');
+      }
+    }
+
+    previewBtn.onclick = ()=>{
+      if(uploadedImage){
+        previewImg.src = uploadedImage;
+      } else {
+        alert('Please upload an image first.');
+      }
+    }
+
+    regenerateBtn.onclick = ()=>{
+      if(!uploadedImage){
+        alert('Please upload an image first.');
+        return;
+      }
+      if(!previewImg.src){
+        previewImg.src = uploadedImage; // keep original preview
+      }
+      const img = new Image();
+      img.src = uploadedImage;
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0);
+        // Simple horizontal symmetry for demo
+        ctx.scale(-1,1);
+        ctx.drawImage(img,-img.width,0);
+        regeneratedImg.src = canvas.toDataURL();
+      }
+    }
+  </script>
+</body>
+</html>
+
+

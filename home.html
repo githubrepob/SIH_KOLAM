@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kolam Lab — Home</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap");
+
+      :root {
+        --saffron: #f6a11a;
+        --maroon: #7c1d1d;
+        --leaf: #1b7a5a;
+
+        --bg-light: #fffaf6;
+        --panel-light: #ffffff;
+        --muted-light: #6b7280;
+        --text-light: #0f1724;
+
+        --bg-dark: #0b1220;
+        --panel-dark: #0f1728;
+        --muted-dark: #9fb0d0;
+        --text-dark: #f6fbff;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        background: var(--bg-light);
+        color: var(--text-light);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transition: background-color 300ms ease, color 300ms ease;
+      }
+
+      .pattern-light {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23e9e5e0' stroke-width='2' opacity='0.38'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+        background-repeat: repeat;
+        background-size: 520px;
+      }
+      .pattern-dark {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23192a3f' stroke-width='2' opacity='0.16'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+        background-repeat: repeat;
+        background-size: 520px;
+      }
+
+      /* ---------------- Navbar ---------------- */
+      .site-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        z-index: 70;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.86),
+          rgba(255, 250, 245, 0.72)
+        );
+        border-bottom: 1px solid rgba(16, 24, 40, 0.04);
+        backdrop-filter: blur(8px) saturate(120%);
+        -webkit-backdrop-filter: blur(8px) saturate(120%);
+        transition: background 260ms ease, box-shadow 260ms ease;
+        box-shadow: 0 6px 20px rgba(16, 24, 40, 0.04);
+        padding: 0 20px;
+        box-sizing: border-box;
+      }
+      .nav-container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .logo-mark {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--saffron), var(--maroon));
+        box-shadow: 0 8px 20px rgba(124, 29, 29, 0.12);
+        flex: 0 0 auto;
+      }
+      .brand {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .brand .title {
+        font-weight: 800;
+        white-space: nowrap;
+        color: var(--text-light);
+      }
+      .brand .tag {
+        font-size: 12px;
+        color: var(--muted-light);
+        margin-top: 2px;
+        white-space: nowrap;
+      }
+      .nav-links {
+        display: flex;
+        gap: 34px;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+      }
+      .nav-link {
+        font-size: 15px;
+        color: rgba(15, 23, 36, 0.85);
+        text-decoration: none;
+        padding: 10px 6px;
+        border-radius: 8px;
+        transition: color 180ms ease, background 180ms ease,
+          transform 180ms ease;
+        font-weight: 600;
+      }
+      .nav-link:hover {
+        color: var(--text-light);
+        transform: translateY(-2px);
+      }
+      .nav-link.active {
+        color: var(--maroon);
+        background: linear-gradient(
+          90deg,
+          rgba(124, 29, 29, 0.06),
+          rgba(246, 161, 26, 0.03)
+        );
+        box-shadow: inset 0 -4px 0 rgba(246, 161, 26, 0.06);
+      }
+      .nav-actions {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex: 0 0 auto;
+      }
+      .btn-login {
+        padding: 10px 18px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(90deg, var(--saffron), var(--leaf));
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(27, 122, 90, 0.12);
+      }
+      .toggle {
+        width: 46px;
+        height: 28px;
+        border-radius: 999px;
+        padding: 3px;
+        display: inline-flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.94);
+      }
+      .toggle .thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        transition: transform 220ms ease, background 220ms ease;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+      }
+      .hamburger {
+        display: none;
+        background: transparent;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+      }
+      html.dark .site-nav {
+        background: linear-gradient(
+          180deg,
+          rgba(7, 12, 20, 0.9),
+          rgba(6, 10, 18, 0.9)
+        );
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        backdrop-filter: blur(10px) saturate(140%);
+      }
+      html.dark .brand .title {
+        color: var(--text-dark);
+      }
+      html.dark .brand .tag {
+        color: var(--muted-dark);
+      }
+      html.dark .nav-link {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      html.dark .nav-link:hover {
+        color: #fff;
+      }
+      html.dark .nav-link.active {
+        color: #ffd59a;
+        background: rgba(255, 255, 255, 0.02);
+        box-shadow: inset 0 -4px 0 rgba(255, 255, 255, 0.02);
+      }
+      html.dark .btn-login {
+        color: #071224;
+      }
+      @media (max-width: 900px) {
+        .nav-links {
+          display: none;
+        }
+        .hamburger {
+          display: inline-flex;
+        }
+      }
+
+      /* ---------------- Page content ---------------- */
+      .page-content {
+        position: relative;
+        z-index: 10;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 140px 28px 40px;
+      }
+      .hero-card {
+        border-radius: 16px;
+        background: var(--panel-light);
+        box-shadow: 0 18px 50px rgba(20, 25, 35, 0.06);
+        padding: 44px;
+        display: flex;
+        gap: 36px;
+      }
+      .hero-title {
+        font-size: 44px;
+        font-weight: 800;
+        background: linear-gradient(90deg, var(--maroon), var(--saffron));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin: 0;
+      }
+      .hero-desc {
+        color: var(--muted-light);
+        margin-top: 14px;
+        max-width: 720px;
+      }
+      .cta-primary {
+        background: linear-gradient(90deg, var(--saffron), var(--leaf));
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 8px 22px rgba(27, 122, 90, 0.12);
+      }
+      .cta-hero {
+        background: rgba(246, 161, 26, 0.1);
+        color: var(--maroon);
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        border: 1px solid rgba(246, 161, 26, 0.3);
+        cursor: pointer;
+        transition: background 200ms ease;
+      }
+      .cta-hero:hover {
+        background: rgba(246, 161, 26, 0.2);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        margin-top: 40px;
+      }
+      .feature-card {
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 12px 30px rgba(16, 24, 40, 0.04);
+        padding: 22px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+      }
+
+      /* ---------------- Art Gallery section ---------------- */
+      .gallery-section {
+        margin-top: 50px;
+        border-radius: 14px;
+        padding: 32px;
+        background: linear-gradient(
+          90deg,
+          rgba(246, 161, 26, 0.12),
+          rgba(27, 122, 90, 0.08)
+        );
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: popIn 0.6s ease;
+      }
+      .gallery-section h2 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 800;
+        background: linear-gradient(90deg, var(--maroon), var(--leaf));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .gallery-btn {
+        background: linear-gradient(90deg, var(--saffron), var(--maroon));
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 200ms ease;
+        box-shadow: 0 6px 16px rgba(124, 29, 29, 0.2);
+      }
+      .gallery-btn:hover {
+        transform: scale(1.05);
+      }
+
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ---------------- Footer ---------------- */
+      footer {
+        padding: 60px 0 120px;
+        color: var(--muted-light);
+        text-align: center;
+      }
+
+      /* ---------------- Dark mode ---------------- */
+      html.dark body {
+        background: var(--bg-dark);
+        color: var(--text-dark);
+      }
+      html.dark .hero-card {
+        background: linear-gradient(180deg, var(--panel-dark), #0b1722);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-dark);
+      }
+      html.dark .feature-card {
+        background: rgba(15, 23, 40, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-dark);
+      }
+      html.dark .hero-desc,
+      html.dark .feature-card p,
+      html.dark footer {
+        color: var(--muted-dark);
+      }
+      html.dark .cta-hero {
+        background: rgba(124, 29, 29, 0.2);
+        color: #ffd59a;
+        border: 1px solid rgba(124, 29, 29, 0.4);
+      }
+      html.dark .cta-hero:hover {
+        background: rgba(124, 29, 29, 0.3);
+      }
+      html.dark .gallery-section {
+        background: linear-gradient(
+          90deg,
+          rgba(124, 29, 29, 0.25),
+          rgba(27, 122, 90, 0.25)
+        );
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+      }
+      html.dark .gallery-section h2 {
+        background: none;
+        color: var(--text-dark); /* ✅ Fix: visible text in dark mode */
+      }
+      html.dark .gallery-btn {
+        color: #0b1220;
+        background: linear-gradient(90deg, var(--saffron), var(--leaf));
+      }
+    </style>
+  </head>
+  <body class="pattern-light">
+    <!-- Navbar -->
+    <header class="site-nav">
+      <div class="nav-container">
+        <div class="nav-left">
+          <div class="logo-mark">K</div>
+          <div class="brand">
+            <div class="title">Kolam Lab</div>
+            <div class="tag">Design • Analyze • Generate</div>
+          </div>
+        </div>
+        <nav class="nav-links">
+          <a class="nav-link" href="studio.html">Studio</a>
+          <a class="nav-link" href="generator.html">Generate</a>
+          <a class="nav-link" href="analyze.html">Analyzer</a>
+        </nav>
+        <div class="nav-actions">
+          <button id="loginBtn" class="btn-login">Login</button>
+          <div
+            id="darkToggle"
+            style="display: flex; align-items: center; gap: 8px"
+          >
+            <div class="toggle"><div class="thumb" id="thumbEl"></div></div>
+            <div
+              style="font-size: 13px; color: var(--muted-light)"
+              id="darkLabel"
+            >
+              Dark
+            </div>
+          </div>
+          <button class="hamburger" id="hamburgerBtn">☰</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content">
+      <section class="hero-card">
+        <div style="flex: 1">
+          <h1 class="hero-title">Kolam Lab — Tradition coded beautifully</h1>
+          <p class="hero-desc">
+            Explore the geometry of South Indian kolam designs. Upload a sketch
+            to analyze its rules, craft new patterns in Studio, or instantly
+            generate SVG-ready kolams using parameterized rules — all with
+            exportable assets.
+          </p>
+          <div
+            style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap"
+          >
+            <button class="cta-hero">Open Analyzer</button>
+            <button class="cta-hero">Open Studio</button>
+            <button class="cta-hero">Generate</button>
+          </div>
+        </div>
+        <div
+          style="
+            width: 420px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          "
+        >
+          <img
+            id="kolamPreview"
+            src=""
+            alt="Kolam preview"
+            style="
+              width: 360px;
+              height: 160px;
+              border-radius: 12px;
+              object-fit: cover;
+              box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+              cursor: pointer;
+            "
+          />
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="feature-card">
+          <div
+            class="feature-icon"
+            style="
+              background: linear-gradient(90deg, var(--leaf), var(--maroon));
+            "
+          >
+            A
+          </div>
+          <div>
+            <h3>Analyzer</h3>
+            <p style="color: var(--muted-light)">
+              Upload a photo or sketch. We detect symmetries, grid points,
+              stroke order and extract generative rules as JSON.
+            </p>
+            <div style="display: flex; gap: 8px">
+              <button class="cta-primary">Analyze Now</button>
+              <a
+                style="
+                  align-self: center;
+                  color: var(--muted-light);
+                  font-size: 13px;
+                "
+                >How it works →</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div
+            class="feature-icon"
+            style="background: linear-gradient(90deg, var(--saffron), #f07b3f)"
+          >
+            S
+          </div>
+          <div>
+            <h3>Studio</h3>
+            <p style="color: var(--muted-light)">
+              A parametric canvas to compose kolams by rules: dots, loops,
+              mirroring, and stroke styles. Live preview and timeline undo/redo.
+            </p>
+            <div style="display: flex; gap: 8px">
+              <button class="cta-primary">Open Studio</button>
+              <a
+                style="
+                  align-self: center;
+                  color: var(--muted-light);
+                  font-size: 13px;
+                "
+                >Templates →</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div
+            class="feature-icon"
+            style="background: linear-gradient(90deg, #8b5cf6, #ec4899)"
+          >
+            G
+          </div>
+          <div>
+            <h3>Generate</h3>
+            <p style="color: var(--muted-light)">
+              Instantly create variations from rules and randomness sliders.
+              Export to SVG and use as prints, rangoli stencils, or digital art.
+            </p>
+            <div style="display: flex; gap: 8px">
+              <button class="cta-primary">Generate</button>
+              <a
+                style="
+                  align-self: center;
+                  color: var(--muted-light);
+                  font-size: 13px;
+                "
+                >Presets →</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- New Art Gallery Section -->
+      <section class="gallery-section">
+        <h2>Kolam Art Gallery</h2>
+        <button
+          class="gallery-btn"
+          onclick="window.location.href='gallery.html'"
+        >
+          View Art Gallery →
+        </button>
+      </section>
+    </main>
+
+    <footer>
+      © <span id="yr"></span> Kolam Lab — Inspired by southern traditions
+    </footer>
+
+    <script src="randomImage.js"></script>
+  </body>
+</html>

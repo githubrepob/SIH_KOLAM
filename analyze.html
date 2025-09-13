@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kolam Lab — Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --saffron:#f6a11a; --maroon:#7c1d1d; --leaf:#1b7a5a;
+  --bg-light:#fffaf6; --panel-light:#ffffff; --muted-light:#6b7280; --text-light:#0f1724;
+  --bg-dark:#0b1220; --panel-dark:#0f1728; --muted-dark:#9fb0d0; --text-dark:#f6fbff;
+}
+html,body { margin:0; font-family:Inter,sans-serif; background:var(--bg-light); color:var(--text-light); }
+html.dark body { background:var(--bg-dark); color:var(--text-dark); }
+
+.site-nav{position:fixed;top:0;left:0;right:0;height:100px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,250,245,0.72));border-bottom:1px solid rgba(16,24,40,0.04);backdrop-filter: blur(8px) saturate(120%);box-shadow:0 6px 20px rgba(16,24,40,0.04);padding:0 20px;z-index:100;}
+html.dark .site-nav { background: linear-gradient(180deg, rgba(7,12,20,0.9), rgba(6,10,18,0.9)); }
+.nav-container { width:100%; max-width:1200px; display:flex; align-items:center; justify-content:space-between; }
+.nav-left { display:flex; align-items:center; gap:12px; }
+.logo-mark { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; background:linear-gradient(135deg,var(--saffron),var(--maroon)); box-shadow:0 8px 20px rgba(124,29,29,0.12); }
+.brand { display:flex; flex-direction:column; }
+.brand .title { font-weight:800; }
+.brand .tag { font-size:12px; color:var(--muted-light); }
+.nav-links { display:flex; gap:28px; align-items:center; }
+.nav-link { font-weight:600; text-decoration:none; padding:8px 10px; border-radius:8px; color: rgba(15,23,36,0.85); transition: all 0.2s ease; }
+.nav-link.active { color:var(--maroon); background:linear-gradient(90deg, rgba(124,29,29,0.06), rgba(246,161,26,0.03)); box-shadow: inset 0 -4px 0 rgba(246,161,26,0.06); }
+html.dark .nav-link { color: rgba(255,255,255,0.85); }
+html.dark .nav-link.active { color:#ffd59a; background: rgba(255,255,255,0.02); box-shadow: inset 0 -4px 0 rgba(255,255,255,0.02); }
+
+main { padding-top:140px; display:flex; justify-content:center; }
+.panel { background:var(--panel-light); border-radius:20px; padding:40px 30px; max-width:800px; width:100%; text-align:center; box-shadow:0 12px 30px rgba(16,24,40,0.1); transition: all 0.3s ease; }
+html.dark .panel { background:var(--panel-dark); }
+
+.drag-box { border:2px dashed var(--muted-light); border-radius:16px; padding:60px 20px; cursor:pointer; transition: all 0.3s ease; width:100%; box-sizing:border-box; margin-bottom:20px; overflow:hidden; }
+.drag-box:hover { border-color:var(--maroon); background: rgba(246,161,26,0.05); }
+html.dark .drag-box { border-color:var(--muted-dark); background:var(--panel-dark); }
+
+.buttons-row { display:flex; justify-content:center; gap:40px; margin-bottom:20px; align-items:flex-start; }
+.buttons-row > div { text-align:center; }
+
+.btn { padding:10px 24px; font-weight:700; border-radius:12px; border:none; cursor:pointer; transition: all 0.3s ease; }
+.btn-preview { background: linear-gradient(90deg,var(--saffron),var(--leaf)); color:#fff; }
+.btn-analyze { background: linear-gradient(90deg,var(--maroon),var(--saffron)); color:#fff; }
+.btn-preview:hover, .btn-analyze:hover { transform:scale(1.05); }
+
+#previewImg { max-width:180px; border-radius:12px; display:none; margin:10px auto 0 auto; box-shadow:0 8px 20px rgba(0,0,0,0.12); transition: all 0.4s ease; }
+#analysisResult { margin-top:10px; background: linear-gradient(135deg, rgba(246,161,26,0.1), rgba(124,29,29,0.1)); border-radius:12px; padding:15px; display:none; text-align:left; box-shadow:0 8px 25px rgba(0,0,0,0.1); transform: translateY(-20px); opacity:0; transition: all 0.5s ease; max-width:200px; }
+#analysisResult.show { display:block; transform: translateY(0); opacity:1; }
+#analysisResult h3 { margin-top:0; margin-bottom:8px; color:var(--maroon); font-size:16px; }
+#analysisResult p { margin:4px 0; font-weight:600; font-size:14px; }
+html.dark #analysisResult { background: linear-gradient(135deg, rgba(124,29,29,0.15), rgba(246,161,26,0.08)); color: var(--text-dark); }
+
+@media(max-width:700px){ .buttons-row { flex-direction:column; gap:20px; } }
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+  <div class="nav-container">
+    <div class="nav-left">
+      <div class="logo-mark">K</div>
+      <div class="brand">
+        <div class="title">Kolam Lab</div>
+        <div class="tag">Design • Analyze • Generate</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a class="nav-link" href="home.html">Home</a>
+      <a class="nav-link active" href="analyze.html">Analyzer</a>
+      <a class="nav-link" href="studio.html">Studio</a>
+      <a class="nav-link" href="generator.html">Generate</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="panel">
+    <div class="drag-box" id="dragBox">Click or Drag an Image Here</div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <div class="buttons-row">
+      <div>
+        <button id="previewBtn" class="btn btn-preview">Preview</button>
+        <img id="previewImg" alt="Preview Image">
+      </div>
+      <div>
+        <button id="analyzeBtn" class="btn btn-analyze">Analyze</button>
+        <div id="analysisResult">
+          <h3>Analysis Result:</h3>
+          <p id="dots">Dots: </p>
+          <p id="loops">Loops: </p>
+          <p id="circles">Circles: </p>
+          <p id="complexity">Complexity: </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const dragBox = document.getElementById("dragBox");
+const fileInput = document.getElementById("fileInput");
+const previewBtn = document.getElementById("previewBtn");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const previewImg = document.getElementById("previewImg");
+const analysisResult = document.getElementById("analysisResult");
+const dots = document.getElementById("dots");
+const loops = document.getElementById("loops");
+const circles = document.getElementById("circles");
+const complexity = document.getElementById("complexity");
+
+let selectedFile = null;
+
+dragBox.addEventListener("click", ()=>fileInput.click());
+dragBox.addEventListener("dragover", e=>{ e.preventDefault(); dragBox.style.borderColor="#f6a11a"; });
+dragBox.addEventListener("dragleave", ()=>{ dragBox.style.borderColor="var(--muted-light)"; });
+dragBox.addEventListener("drop", e=>{
+  e.preventDefault();
+  dragBox.style.borderColor="var(--muted-light)";
+  selectedFile = e.dataTransfer.files[0];
+});
+fileInput.addEventListener("change", e=>{ selectedFile = e.target.files[0]; });
+
+previewBtn.addEventListener("click", ()=>{
+  if(!selectedFile){ alert("Please upload an image first."); return; }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    previewImg.src=e.target.result;
+    previewImg.style.display="block";
+  }
+  reader.readAsDataURL(selectedFile);
+});
+
+analyzeBtn.addEventListener("click", ()=>{
+  if(!selectedFile){ alert("Please upload an image first."); return; }
+  analysisResult.classList.remove("show");
+  analysisResult.offsetWidth; // reflow
+
+  dots.textContent="Dots: 0";
+  loops.textContent="Loops: 0";
+  circles.textContent="Circles: 0";
+  complexity.textContent="Complexity: Calculating...";
+  analysisResult.classList.add("show");
+
+  let count=0;
+  const interval = setInterval(()=>{
+    count++;
+    dots.textContent=`Dots: ${Math.min(count*2, 12)}`;
+    loops.textContent=`Loops: ${Math.min(Math.floor(count/4), 3)}`;
+    circles.textContent=`Circles: ${Math.min(Math.floor(count/6), 2)}`;
+    if(count>=6){ complexity.textContent="Complexity: Medium"; clearInterval(interval); }
+  },300);
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
