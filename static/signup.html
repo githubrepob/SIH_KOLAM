@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kolam Lab — Sign up</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* --- captcha and alignment fixes --- */
+    .captcha-row { display:flex; gap:28px; align-items:flex-start; justify-content:center; flex-wrap:wrap; }
+    .captcha-left { display:flex; flex-direction:column; align-items:center; gap:10px; min-width:200px; max-width:260px; }
+    .captcha-right { display:flex; flex-direction:column; gap:10px; min-width:260px; max-width:420px; }
+    .captcha-frame { width:220px;height:220px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(250,250,250,0.96));border:1px solid rgba(0,0,0,0.04);box-shadow:inset 0 4px 18px rgba(0,0,0,0.03);overflow:hidden; }
+    .captcha-frame img { width:100%;height:100%;object-fit:contain;display:block;opacity:0;transform:scale(.995);transition:opacity .28s ease,transform .28s ease; }
+    .captcha-frame img.loaded { opacity:1;transform:scale(1); }
+    .captcha-question { text-align:center;font-weight:700;margin-top:6px; }
+    #captchaVerifyBtn { padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(16,24,40,0.04); }
+    .hint-btn { padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:linear-gradient(90deg,var(--saffron),var(--leaf));color:white;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(16,24,40,0.08); }
+    .hint-btn:hover { transform:translateY(-1px);transition:transform .14s ease; }
+    .captcha-check { width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:inline-flex;align-items:center;justify-content:center;color:white;opacity:0;transform:scale(.85);transition:all 320ms cubic-bezier(.2,.9,.2,1);box-shadow:0 6px 18px rgba(6,95,70,0.12);margin-left:8px; }
+    .captcha-check.visible { opacity:1; transform:scale(1); }
+    .agree-row { display:inline-flex;align-items:center;gap:10px;font-size:14px; }
+    .checkbox-input { width:18px;height:18px;margin:0; }
+  </style>
+</head>
+<body class="pattern-light">
+  <div class="container">
+    <div class="card" role="region" aria-label="Sign up">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--saffron),var(--maroon));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800">K</div>
+        <div>
+          <div style="font-weight:800;font-size:18px">Kolam Lab</div>
+          <div style="font-size:13px;color:var(--muted-light)">Design • Analyze • Generate</div>
+        </div>
+      </div>
+
+      <h2 style="font-size:20px;font-weight:800;margin:6px 0 12px 0;">Create your account</h2>
+
+      <form id="signupForm" novalidate>
+        <div style="margin-bottom:12px;">
+          <label>First name <span style="color:#ef4444">*</span></label>
+          <input id="firstName" type="text" />
+          <p id="errFirst" class="hidden" style="color:#ef4444;font-size:13px;">Required</p>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label>Email <span style="color:#ef4444">*</span></label>
+          <input id="signupEmail" type="email" />
+          <p id="errSignupEmail" class="hidden" style="color:#ef4444;font-size:13px;">Invalid email</p>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label>Password <span style="color:#ef4444">*</span></label>
+          <div class="pw-wrapper">
+            <input id="signupPwd" type="password" minlength="6" placeholder="Choose a password" />
+            <button type="button" class="toggle-pw" onclick="togglePw('signupPwd', this)">👁</button>
+          </div>
+          <p id="errSignupPwd" class="hidden" style="color:#ef4444;font-size:13px;">Password must be at least 6 characters</p>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label>Confirm password <span style="color:#ef4444">*</span></label>
+          <div class="pw-wrapper">
+            <input id="confirmPwd" type="password" placeholder="Re-enter password" />
+            <button type="button" class="toggle-pw" onclick="togglePw('confirmPwd', this)">👁</button>
+          </div>
+          <p id="errConfirm" class="hidden" style="color:#ef4444;font-size:13px;">Passwords do not match</p>
+        </div>
+
+        <!-- Captcha -->
+        <div style="margin-bottom:14px;">
+          <label style="font-weight:700">Verification</label>
+          <div class="captcha-row" style="margin-top:10px;">
+            <div class="captcha-left">
+              <div class="captcha-frame"><img id="captchaImg" src="" alt="Kolam captcha" /></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div id="captchaQuestion" class="captcha-question">Loading…</div>
+                <div id="captchaCheck" class="captcha-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l3.5 3.5L19 5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            <div class="captcha-right">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input id="captchaInput" type="text" placeholder="e.g. 7" style="flex:1" />
+                <button id="captchaRefresh" type="button">↻</button>
+                <button id="captchaVerifyBtn" type="button">Verify</button>
+              </div>
+              <button id="captchaHintBtn" class="hint-btn" type="button">Give me a hint</button>
+              <div id="captchaMsg" class="small-muted"></div>
+              <div id="captchaHintBox"></div>
+            </div>
+          </div>
+          <p id="errCaptcha" class="hidden" style="color:#ef4444;font-size:13px;margin-top:8px;">Please solve the challenge</p>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label class="agree-row"><input id="agree" class="checkbox-input" type="checkbox" /> I agree to the terms</label>
+          <p id="errAgree" class="hidden" style="color:#ef4444;font-size:13px;">You must agree</p>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button id="submitBtn" type="submit" class="btn" title="Complete captcha to enable">Create account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="captcha-client.js"></script>
+  <script>
+    function togglePw(id, btn){ const i=document.getElementById(id); if(i.type==="password"){i.type="text";btn.textContent="🙈";} else {i.type="password";btn.textContent="👁";}}
+    (async function(){ await initKolamWidget({imgId:'captchaImg',questionId:'captchaQuestion',inputId:'captchaInput',refreshId:'captchaRefresh',msgId:'captchaMsg',hintBoxId:'captchaHintBox',verifyBtnId:'captchaVerifyBtn',hintBtnId:'captchaHintBtn',checkId:'captchaCheck',submitEnableCallback:(ok)=>{const s=document.getElementById('submitBtn');s.disabled=!ok;if(ok)s.removeAttribute('title');else s.setAttribute('title','Complete captcha to enable');}}); })();
+  </script>
+</body>
+</html>

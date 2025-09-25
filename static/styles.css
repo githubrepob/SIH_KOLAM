@@ -1,0 +1,222 @@
+:root{
+  --saffron:#f6a11a; --maroon:#7c1d1d; --leaf:#1b7a5a;
+  --bg-light:#fffaf6; --panel-light:#ffffff;
+  --muted-light:#6b7280; --text-light:#0f1724;
+  --bg-dark:#0b1220; --panel-dark:#0f1728;
+  --muted-dark:#9fb0d0; --text-dark:#f6fbff;
+}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+  background:var(--bg-light); color:var(--text-light);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  transition: background-color .28s ease, color .28s ease;
+}
+
+.pattern-light{
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23e9e5e0' stroke-width='2' opacity='0.38'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+  background-repeat: repeat; background-size:520px;
+}
+.pattern-dark{
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><g fill='none' stroke='%23192a3f' stroke-width='0.8' opacity='0.12'><circle cx='300' cy='300' r='220'/><path d='M80 300 Q300 80 520 300 Q300 520 80 300Z'/></g></svg>");
+  background-repeat: repeat; background-size:520px;
+}
+
+.container {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+}
+
+.card {
+  width:100%;
+  max-width:480px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
+  padding:28px;
+  border-radius:14px;
+  box-shadow:0 20px 50px rgba(16,24,40,0.08);
+  transition: background .28s ease, border .28s ease, color .28s ease;
+}
+
+/* dark variants */
+html.dark body { background:var(--bg-dark); color:var(--text-dark); }
+html.dark .card{
+  background: linear-gradient(180deg, var(--panel-dark), rgba(7,12,20,0.9));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 18px 50px rgba(2,6,23,0.6);
+  color: var(--text-dark);
+}
+
+input {
+  background: #fff;
+  color: var(--text-light);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 12px;
+  border-radius: 8px;
+  font-size:14px;
+  width:100%;
+}
+input:focus {
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+  border-color: rgba(124,29,29,0.12);
+}
+html.dark input {
+  background: rgba(255,255,255,0.02);
+  color: var(--text-dark);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.pw-inline-msg {display:none;margin-bottom:6px;font-weight:700;color:#b91c1c;font-size:13px;}
+.hidden{display:none;}
+
+/* password field container */
+.pw-wrapper {
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+.pw-wrapper input {
+  padding-right:42px;
+}
+.toggle-pw {
+  position:absolute;
+  right:10px; top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:13px;
+  background:none;
+  border:none;
+  color:var(--muted-light);
+}
+
+/* === Kolam CAPTCHA styles === */
+#captchaArea {
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+#captchaImg {
+  max-width:100%; width:200px; height:200px; object-fit:contain;
+  border-radius:12px; box-shadow:0 8px 22px rgba(16,24,40,0.06);
+  border:1px solid rgba(0,0,0,0.08);
+}
+#captchaQuestion {
+  font-weight:700;font-size:14px;text-align:center;
+}
+#captchaInput {
+  padding:10px 12px;
+  border-radius:10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  min-width:110px;
+  font-weight:600;
+}
+#captchaRefresh {
+  padding:8px 12px;
+  border-radius:10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: linear-gradient(180deg, #ffffff, #f6f6f6);
+  cursor:pointer;
+  font-weight:700;
+}
+html.dark #captchaImg { border-color:rgba(255,255,255,0.06); }
+html.dark #captchaInput {
+  background: rgba(255,255,255,0.02); color: var(--text-dark);
+  border-color: rgba(255,255,255,0.06);
+}
+html.dark #captchaRefresh {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-dark);
+}
+
+/* small helpers */
+.small-muted { font-size:12px;color:var(--muted-light); }
+.btn {
+  padding:12px 18px;border-radius:10px;background:linear-gradient(90deg,var(--saffron),var(--leaf));
+  color:white;font-weight:700;cursor:pointer;border:none;
+}
+/* --- layout fixes and polished captcha/hint styles --- */
+
+/* Keep captcha area centered and tidy */
+.captcha-row {
+  display:flex;
+  gap:28px;
+  align-items:flex-start;
+  justify-content:center;       /* center overall horizontally */
+  flex-wrap:wrap;
+}
+
+/* left column (image) */
+.captcha-left {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  min-width:200px;
+  max-width:260px;
+}
+
+/* right column (controls & hint) */
+.captcha-right {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:260px;
+  max-width:420px;
+}
+
+/* make hint button match other buttons visually */
+.hint-btn, .hint-btn:focus {
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(0,0,0,0.08);
+  background: linear-gradient(90deg,var(--saffron),var(--leaf));
+  color: white;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.08);
+  outline: none;
+}
+
+/* subtle hover */
+.hint-btn:hover { transform: translateY(-1px); transition: transform .14s ease; }
+
+/* hint box constrained and aligned */
+#captchaHintBox { width:100%; margin-top:6px; }
+.hint-box { width:100%; box-sizing:border-box; }
+
+/* keep question centered under image */
+.captcha-question { text-align:center; margin-top:6px; font-weight:700; }
+
+/* image frame adjustments */
+.captcha-frame {
+  width:220px; height:220px; border-radius:14px; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+  border:1px solid rgba(0,0,0,0.04);
+  box-shadow: inset 0 4px 18px rgba(0,0,0,0.03);
+}
+.captcha-frame img { width:100%; height:100%; object-fit:contain; display:block; transition:opacity .28s ease, transform .28s ease; opacity:0; transform:scale(.995); }
+.captcha-frame img.loaded { opacity:1; transform:scale(1); }
+
+/* green check (keeps previous look) */
+.captcha-check { margin-left:10px; }
+
+/* align checkbox and label on a single row */
+.agree-row {
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+  vertical-align:middle;
+}
+
+/* ensure checkbox visually centered with label */
+.checkbox-input { width:18px; height:18px; margin:0; transform:translateY(0); }
+
+/* responsive */
+@media (max-width:820px) {
+  .captcha-row { gap:16px; }
+  .captcha-right { max-width:100%; min-width:220px; }
+  .captcha-left { min-width:180px; max-width:200px; }
+}
